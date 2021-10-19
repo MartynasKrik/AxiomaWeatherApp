@@ -1,0 +1,435 @@
+﻿<Window x:Class="AxiomaWeatherApp.MainWindow"
+       
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AxiomaWeatherApp"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+
+    <Window.Resources>
+        <local:FontSizeConverterOtherTemps x:Key="fontSizeConOtherTemps" />
+        <local:FontSizeConverterOther x:Key="fontSizeConOther" />
+        <local:FontSizeConverterDailyText x:Key="fontSizeConDailyText" />
+        <local:FontSizeConverterDailyTemp x:Key="fontSizeConDailyTemp" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="5*"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="FirstRow" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="CurrentForecast" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="place" IsReadOnly = "True" TextAlignment="Center" Text="{Binding CurrentWeather.Place, Mode = OneWay}" TextWrapping="Wrap" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConDailyText}}"/>
+
+                <Grid x:Name="CurrentTempAndIcon" Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox x:Name="CurrentTemp" IsReadOnly = "True" TextAlignment="Center" Text="{Binding CurrentWeather.Temp, Mode = OneWay}" TextWrapping="Wrap" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConDailyTemp}}" Grid.Column="0"/>
+                    <Image Source="{Binding CurrentWeather.ImagePath, Mode = OneWay}" Grid.Column="1"/>
+
+                </Grid>
+
+                <TextBox x:Name="CurrentCondition" IsReadOnly = "True" TextAlignment="Center" Text="{Binding CurrentWeather.Condition, Mode = OneWay}" TextWrapping="Wrap" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConDailyText}}"/>
+                <TextBox x:Name="MinMax" IsReadOnly = "True" TextAlignment="Center" Text="{Binding CurrentWeather.MinMax, Mode = OneWay}" TextWrapping="Wrap" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConDailyText}}"/>
+                <TextBox x:Name="CurrentWind" IsReadOnly = "True" TextAlignment="Center" Text="{Binding CurrentWeather.Wind, Mode = OneWay}" TextWrapping="Wrap" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConDailyText}}"/>
+
+            </Grid>
+
+            <Grid x:Name="SelectLocation" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="6*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="SearchBox" Text="{Binding SearchText, Mode = TwoWay}" GotFocus="SearchBoxGotFocus" TextWrapping="Wrap" Grid.Column="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConDailyTemp}}"/>
+                    <Button x:Name="SearchBtn" Content="Ieškoti" Click="SearchBtnClick" Grid.Column="1" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConDailyTemp}}"/>
+
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="RefreshBtn" Content="Atnaujinti prognozę" Click="RefreshBtnClick" Grid.Column="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConDailyTemp}}"/>
+                    <Button x:Name="SelectBtn" Content="Pasirinkti" Click="SelectBtnClick" Grid.Column="1" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConDailyTemp}}"/>
+                </Grid>
+                <DataGrid x:Name="PlacesDataGrid" Grid.Row="1" IsReadOnly = "True">
+                   
+                </DataGrid>
+            </Grid>
+        </Grid>
+
+
+
+        <Grid x:Name="HourlyForecast" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="Hourly1" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time1" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[0].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[0].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition1" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[0].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature1" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[0].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind1" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[0].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly2" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time2" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[1].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[1].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition2" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[1].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature2" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[1].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind2" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[1].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly3" Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time3" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[2].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[2].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition3" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[2].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature3" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[2].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind3" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[2].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly4" Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time4" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[3].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[3].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition4" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[3].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature4" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[3].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind4" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[3].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly5" Grid.Column="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time5" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[4].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[4].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition5" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[4].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature5" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[4].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind5" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[4].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly6" Grid.Column="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time6" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[5].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[5].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition6" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[5].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature6" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[5].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind6" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[5].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly7" Grid.Column="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time7" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[6].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[6].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition7" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[6].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature7" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[6].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind7" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[6].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly8" Grid.Column="7">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time8" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[7].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[7].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition8" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[7].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature8" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[7].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind8" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[7].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly9" Grid.Column="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time9" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[8].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[8].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition9" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[8].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature9" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[8].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind9" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[8].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly10" Grid.Column="9">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time10" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[9].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[9].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition10" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[9].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature10" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[9].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind10" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[9].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly11" Grid.Column="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time11" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[10].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[10].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition11" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[10].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature11" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[10].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind11" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[10].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+            <Grid x:Name="Hourly12" Grid.Column="11">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Time12" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[11].Time, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image Source="{Binding HourlyForecasts[11].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="Condition12" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[11].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="Temperature12" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[11].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="Wind12" IsReadOnly = "True" TextAlignment="Center" Text="{Binding HourlyForecasts[11].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+        </Grid>
+
+        <Grid x:Name="WeeklyForecast" Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid x:Name="Weekly1" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Day1" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[0].Day, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image x:Name="WeeklyIcon1" Source="{Binding WeeklyForecasts[0].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="WeekCondition1" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[0].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="WeekTemp1" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[0].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="WeekWind1" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[0].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+
+            <Grid x:Name="Weekly2" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Day2" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[1].Day, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image x:Name="WeeklyIcon2" Source="{Binding WeeklyForecasts[1].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="WeekCondition2" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[1].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="WeekTemp2" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[1].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="WeekWind2" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[1].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+
+            <Grid x:Name="Weekly3" Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Day3" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[2].Day, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image x:Name="WeeklyIcon3" Source="{Binding WeeklyForecasts[2].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="WeekCondition3" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[2].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="WeekTemp3" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[2].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="WeekWind3" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[2].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+
+            <Grid x:Name="Weekly4" Grid.Column="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Day4" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[3].Day, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image x:Name="WeeklyIcon4" Source="{Binding WeeklyForecasts[3].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="WeekCondition4" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[3].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="WeekTemp4" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[3].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="WeekWind4" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[3].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+
+            <Grid x:Name="Weekly5" Grid.Column="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Day5" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[4].Day, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image x:Name="WeeklyIcon5" Source="{Binding WeeklyForecasts[4].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="WeekCondition5" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[4].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="WeekTemp5" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[4].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="WeekWind5" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[4].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+
+            <Grid x:Name="Weekly6" Grid.Column="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="Day6" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[5].Day, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <Image x:Name="WeeklyIcon6" Source="{Binding WeeklyForecasts[5].ImagePath, Mode = OneWay}" Grid.Column="0" Grid.Row="1"/>
+                <TextBox x:Name="WeekCondition6" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[5].Condition, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="2" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+                <TextBox x:Name="WeekTemp6" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[5].Temp, Mode = OneWay}" TextWrapping="Wrap" Grid.Column="0" Grid.Row="3" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOtherTemps}}"/>
+                <TextBox x:Name="WeekWind6" IsReadOnly = "True" TextAlignment="Center" Text="{Binding WeeklyForecasts[5].Wind, Mode = OneWay}" TextWrapping="Wrap"  Grid.Column="0" Grid.Row="4" FontSize="{Binding Path=ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Converter={StaticResource fontSizeConOther}}"/>
+            </Grid>
+
+        </Grid>
+
+
+    </Grid>
+</Window>
